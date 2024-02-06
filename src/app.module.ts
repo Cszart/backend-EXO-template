@@ -3,6 +3,8 @@ import { Module } from '@nestjs/common';
 // Config modules
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+// Custom modules
 import { RoleModule } from './role/roles.module';
 import { UserModule } from './user/user.module';
 import { PermissionModule } from './permission/roles.module';
