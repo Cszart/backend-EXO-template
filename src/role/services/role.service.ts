@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { DeleteResult, ILike, In, Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { catchError, from, map, Observable, of } from 'rxjs';
