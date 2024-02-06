@@ -1,7 +1,7 @@
 import { RoleEntity } from '../models/role.entity';
 import { RoleI } from '../models/role.interface';
 
-export function transformToRoleI(roleEntity: RoleEntity): RoleI {
+export function transformRoleEntityToRoleI(roleEntity: RoleEntity): RoleI {
   return {
     id: roleEntity.id,
     uuid: roleEntity.uuid,

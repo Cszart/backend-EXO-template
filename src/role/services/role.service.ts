@@ -7,7 +7,7 @@ import { catchError, from, map, Observable, of } from 'rxjs';
 
 import { RoleEntity } from '../models/role.entity';
 import { RoleI } from '../models/role.interface';
-import { transformToRoleI } from '../utils/role.utils';
+import { transformRoleEntityToRoleI } from '../utils/role.utils';
 
 @Injectable()
 export class RoleService {
@@ -49,7 +49,7 @@ export class RoleService {
   async findAllRoles(): Promise<Observable<RoleI[]>> {
     const rolesData = await this.rolesRepository.find({ order: { id: 'DESC' } });
 
-    const rolesResponse: RoleI[] = rolesData.map((role: RoleEntity) => transformToRoleI(role));
+    const rolesResponse: RoleI[] = rolesData.map((role: RoleEntity) => transformRoleEntityToRoleI(role));
 
     return of(rolesResponse);
   }
@@ -62,7 +62,7 @@ export class RoleService {
         catchError(error => {
           throw new NotFoundException('Could not find role');
         }),
-        map((role: RoleEntity) => transformToRoleI(role)),
+        map((role: RoleEntity) => transformRoleEntityToRoleI(role)),
       );
     } catch (error) {
       throw new NotFoundException('Could not find role');
@@ -86,7 +86,7 @@ export class RoleService {
     const updatedRole = await this.rolesRepository.save(role);
 
     // Transform and return the updated role entity as RoleI
-    return transformToRoleI(updatedRole);
+    return transformRoleEntityToRoleI(updatedRole);
   }
 
   // Delete
