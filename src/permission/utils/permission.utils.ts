@@ -1,12 +1,15 @@
+// Updated transformPermissionEntityToPermissionI function
 import { PermissionEntity } from '../models/permission.entity';
 import { PermissionI } from '../models/permission.interface';
 
-export function transformPermissionEntityToPermissionI(roleEntity: PermissionEntity): PermissionI {
+export function transformPermissionEntityToPermissionI(permissionEntity: PermissionEntity): PermissionI {
   return {
-    id: roleEntity.id,
-    uuid: roleEntity.uuid,
-    permission: roleEntity.permission,
-    createdAt: roleEntity.createdAt.toISOString(),
-    modifiedAt: roleEntity.modifiedAt.toISOString(),
+    id: permissionEntity.id,
+    uuid: permissionEntity.uuid,
+    category: permissionEntity.category,
+    subCategory: permissionEntity.subCategory,
+    permission: permissionEntity.permission,
+    createdAt: permissionEntity.createdAt.toISOString(),
+    modifiedAt: permissionEntity.modifiedAt.toISOString(),
   };
 }

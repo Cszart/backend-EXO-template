@@ -1,10 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-
-import { DeleteResult, Repository } from 'typeorm';
+import { Injectable, HttpStatus, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
-import { catchError, from, map, Observable, of } from 'rxjs';
-
+import { HttpResponseI } from 'src/httpResponse/models/httpResponse.interface';
+import { HttpResponse } from 'src/httpResponse/utils/httpResponse.util';
+import { Repository } from 'typeorm';
 import { PermissionEntity } from '../models/permission.entity';
 import { PermissionI } from '../models/permission.interface';
 import { transformPermissionEntityToPermissionI } from '../utils/permission.utils';
@@ -17,8 +15,9 @@ export class PermissionService {
   ) {}
 
   // --- CRUD functions --- //
+
   // Create
-  async createPermission(permissionData: PermissionI): Promise<Observable<PermissionI>> {
+  async createPermission(permissionData: PermissionI): Promise<HttpResponseI<PermissionI>> {
     const newPermission = new PermissionEntity();
 
     // Append every key received
@@ -33,57 +32,59 @@ export class PermissionService {
     // Save to Database
     const savedPermission = await this.permissionsRepository.save(newPermission);
 
-    return of(transformPermissionEntityToPermissionI(savedPermission));
+    return HttpResponse(
+      HttpStatus.CREATED,
+      'Permission created successfully',
+      transformPermissionEntityToPermissionI(savedPermission),
+    );
   }
 
   // Find all
-  async findAllPermissions(): Promise<Observable<PermissionI[]>> {
+  async findAllPermissions(): Promise<HttpResponseI<PermissionI[]>> {
     const permissionsData = await this.permissionsRepository.find({ order: { id: 'DESC' } });
 
     const permissionsResponse: PermissionI[] = permissionsData.map((permission: PermissionEntity) =>
       transformPermissionEntityToPermissionI(permission),
     );
 
-    return of(permissionsResponse);
+    return HttpResponse(HttpStatus.OK, 'All permissions fetched successfully', permissionsResponse);
   }
 
   // Find one
-  async findOnePermission(id: number): Promise<Observable<PermissionI>> {
+  async findOnePermission(id: number): Promise<HttpResponseI<PermissionI>> {
     try {
-      return from(this.permissionsRepository.findOne({ where: { id: id } })).pipe(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-        catchError(error => {
-          throw new NotFoundException('Could not find permission');
-        }),
-        map((permission: PermissionEntity) => transformPermissionEntityToPermissionI(permission)),
+      const permission = await this.permissionsRepository.findOne({ where: { id: id } });
+      if (!permission) {
+        throw new NotFoundException('Permission not found');
+      }
+      return HttpResponse(
+        HttpStatus.OK,
+        'Permission fetched successfully',
+        transformPermissionEntityToPermissionI(permission),
       );
     } catch (error) {
-      throw new NotFoundException('Could not find permission');
+      throw new NotFoundException('Permission not found');
     }
   }
 
   // Update
-  async updatePermission(id: number, updatedPermissionData: Partial<PermissionI>): Promise<PermissionI> {
-    // Find the permission by ID
+  async updatePermission(id: number, updatedPermissionData: Partial<PermissionI>): Promise<HttpResponseI<PermissionI>> {
     const permission = await this.permissionsRepository.findOne({ where: { id: id } });
-
-    // Throw NotFoundException if the permission with the given ID is not found
     if (!permission) {
       throw new NotFoundException('Permission not found');
     }
-
-    // Update the permission entity with the provided data
     Object.assign(permission, updatedPermissionData);
-
-    // Save the updated permission entity
     const updatedPermission = await this.permissionsRepository.save(permission);
-
-    // Transform and return the updated permission entity as PermissionI
-    return transformPermissionEntityToPermissionI(updatedPermission);
+    return HttpResponse(
+      HttpStatus.OK,
+      'Permission updated successfully',
+      transformPermissionEntityToPermissionI(updatedPermission),
+    );
   }
 
   // Delete
-  async deletePermission(id: number): Promise<Observable<DeleteResult>> {
-    return from(this.permissionsRepository.delete(id));
+  async deletePermission(id: number): Promise<HttpResponseI<void>> {
+    await this.permissionsRepository.delete(id);
+    return HttpResponse(HttpStatus.OK, 'Permission deleted successfully', null);
   }
 }

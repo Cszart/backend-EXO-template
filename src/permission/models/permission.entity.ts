@@ -9,6 +9,12 @@ export class PermissionEntity {
   uuid: string;
 
   @Column({ type: 'varchar', length: 255 })
+  category: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  subCategory: string;
+
+  @Column({ type: 'varchar', length: 255 })
   permission: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
