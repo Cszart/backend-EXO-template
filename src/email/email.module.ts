@@ -9,4 +9,4 @@ import { Module } from '@nestjs/common';
   providers: [EmailTemplateService],
   controllers: [EmailTemplateController],
 })
-export class RoleModule {}
+export class EmailTemplateModule {}
