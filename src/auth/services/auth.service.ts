@@ -6,7 +6,8 @@ import { HttpResponseI } from 'src/httpResponse/models/httpResponse.interface';
 import { HttpResponse } from 'src/httpResponse/utils/httpResponse.util';
 
 import { UserEntity } from 'src/user/models/user.entity';
-import { UserI } from 'src/user/models/user.interface';
+import { UserDTO } from 'src/user/dtos/user.dto';
+import { transformUserEntityToUserDTO } from 'src/user/utils/user.utils';
 
 @Injectable()
 export class AuthService {
@@ -15,17 +16,17 @@ export class AuthService {
     private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
-  async loginUser(email: string): Promise<HttpResponseI<UserI>> {
+  async loginUser(email: string): Promise<HttpResponseI<UserDTO>> {
     const user = await this.usersRepository.findOne({ where: { email } });
     if (user) {
-      return HttpResponse(HttpStatus.OK, 'Login successful', user);
+      return HttpResponse(HttpStatus.OK, 'Login successful', transformUserEntityToUserDTO(user));
     } else {
       throw new NotFoundException('User not found');
     }
   }
 
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  async loginWallet(address: string): Promise<HttpResponseI<UserI>> {
+  async loginWallet(address: string): Promise<HttpResponseI<UserDTO>> {
     return HttpResponse(HttpStatus.OK, 'Login with wallet succesfull', {
       id: 789,
       email: 'admin@example.com',
@@ -51,9 +52,9 @@ export class AuthService {
     });
   }
 
-  async signUpUser(userData: UserI): Promise<HttpResponseI<UserI>> {
+  async signUpUser(userData: UserDTO): Promise<HttpResponseI<UserDTO>> {
     const newUser = this.usersRepository.create(userData);
     const savedUser = await this.usersRepository.save(newUser);
-    return HttpResponse(HttpStatus.CREATED, 'User created successfully', savedUser);
+    return HttpResponse(HttpStatus.CREATED, 'User created successfully', transformUserEntityToUserDTO(savedUser));
   }
 }

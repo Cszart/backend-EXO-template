@@ -4,8 +4,8 @@ import { HttpResponseI } from 'src/httpResponse/models/httpResponse.interface';
 import { HttpResponse } from 'src/httpResponse/utils/httpResponse.util';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../models/user.entity';
-import { UserI } from '../models/user.interface';
-import { transformUserEntityToUserI } from '../utils/user.utils';
+import { transformUserEntityToUserDTO } from '../utils/user.utils';
+import { UserDTO } from '../dtos/user.dto';
 
 @Injectable()
 export class UserService {
@@ -17,7 +17,7 @@ export class UserService {
   // --- CRUD functions --- //
 
   // Create
-  async createUser(userData: UserI): Promise<HttpResponseI<UserI>> {
+  async createUser(userData: UserDTO): Promise<HttpResponseI<UserDTO>> {
     const newUser = new UserEntity();
 
     // Append every key received
@@ -28,40 +28,40 @@ export class UserService {
     // Save to Database
     const savedUser = await this.usersRepository.save(newUser);
 
-    return HttpResponse(HttpStatus.CREATED, 'User created successfully', transformUserEntityToUserI(savedUser));
+    return HttpResponse(HttpStatus.CREATED, 'User created successfully', transformUserEntityToUserDTO(savedUser));
   }
 
   // Find all
-  async findAllUsers(): Promise<HttpResponseI<UserI[]>> {
+  async findAllUsers(): Promise<HttpResponseI<UserDTO[]>> {
     const usersData = await this.usersRepository.find({ order: { id: 'DESC' } });
 
-    const usersResponse: UserI[] = usersData.map((user: UserEntity) => transformUserEntityToUserI(user));
+    const usersResponse: UserDTO[] = usersData.map((user: UserEntity) => transformUserEntityToUserDTO(user));
 
     return HttpResponse(HttpStatus.OK, 'All users fetched successfully', usersResponse);
   }
 
   // Find one
-  async findOneUser(id: number): Promise<HttpResponseI<UserI>> {
+  async findOneUser(id: number): Promise<HttpResponseI<UserDTO>> {
     try {
       const user = await this.usersRepository.findOne({ where: { id: id } });
       if (!user) {
         throw new NotFoundException('User not found');
       }
-      return HttpResponse(HttpStatus.OK, 'User fetched successfully', transformUserEntityToUserI(user));
+      return HttpResponse(HttpStatus.OK, 'User fetched successfully', transformUserEntityToUserDTO(user));
     } catch (error) {
       throw new NotFoundException('User not found');
     }
   }
 
   // Update
-  async updateUser(id: number, updatedUserData: Partial<UserI>): Promise<HttpResponseI<UserI>> {
+  async updateUser(id: number, updatedUserData: Partial<UserDTO>): Promise<HttpResponseI<UserDTO>> {
     const user = await this.usersRepository.findOne({ where: { id: id } });
     if (!user) {
       throw new NotFoundException('User not found');
     }
     Object.assign(user, updatedUserData);
     const updatedUser = await this.usersRepository.save(user);
-    return HttpResponse(HttpStatus.OK, 'User updated successfully', transformUserEntityToUserI(updatedUser));
+    return HttpResponse(HttpStatus.OK, 'User updated successfully', transformUserEntityToUserDTO(updatedUser));
   }
 
   // Delete

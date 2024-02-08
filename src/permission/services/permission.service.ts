@@ -4,8 +4,8 @@ import { HttpResponseI } from 'src/httpResponse/models/httpResponse.interface';
 import { HttpResponse } from 'src/httpResponse/utils/httpResponse.util';
 import { Repository } from 'typeorm';
 import { PermissionEntity } from '../models/permission.entity';
-import { PermissionI } from '../models/permission.interface';
-import { transformPermissionEntityToPermissionI } from '../utils/permission.utils';
+import { PermissionDTO } from '../dtos/permission.dto';
+import { transformPermissionEntityToPermissionDTO } from '../utils/permission.utils';
 
 @Injectable()
 export class PermissionService {
@@ -17,9 +17,8 @@ export class PermissionService {
   // --- CRUD functions --- //
 
   // Create
-  async createPermission(permissionData: PermissionI): Promise<HttpResponseI<PermissionI>> {
+  async createPermission(permissionData: PermissionDTO): Promise<HttpResponseI<PermissionDTO>> {
     const newPermission = new PermissionEntity();
-
     // Append every key received
     Object.keys(permissionData).forEach(key => {
       if (key === 'createdAt' || key === 'modifiedAt') {
@@ -28,30 +27,26 @@ export class PermissionService {
         newPermission[key] = permissionData[key];
       }
     });
-
     // Save to Database
     const savedPermission = await this.permissionsRepository.save(newPermission);
-
     return HttpResponse(
       HttpStatus.CREATED,
       'Permission created successfully',
-      transformPermissionEntityToPermissionI(savedPermission),
+      transformPermissionEntityToPermissionDTO(savedPermission),
     );
   }
 
   // Find all
-  async findAllPermissions(): Promise<HttpResponseI<PermissionI[]>> {
+  async findAllPermissions(): Promise<HttpResponseI<PermissionDTO[]>> {
     const permissionsData = await this.permissionsRepository.find({ order: { id: 'DESC' } });
-
-    const permissionsResponse: PermissionI[] = permissionsData.map((permission: PermissionEntity) =>
-      transformPermissionEntityToPermissionI(permission),
+    const permissionsResponse: PermissionDTO[] = permissionsData.map((permission: PermissionEntity) =>
+      transformPermissionEntityToPermissionDTO(permission),
     );
-
     return HttpResponse(HttpStatus.OK, 'All permissions fetched successfully', permissionsResponse);
   }
 
   // Find one
-  async findOnePermission(id: number): Promise<HttpResponseI<PermissionI>> {
+  async findOnePermission(id: number): Promise<HttpResponseI<PermissionDTO>> {
     try {
       const permission = await this.permissionsRepository.findOne({ where: { id: id } });
       if (!permission) {
@@ -60,7 +55,7 @@ export class PermissionService {
       return HttpResponse(
         HttpStatus.OK,
         'Permission fetched successfully',
-        transformPermissionEntityToPermissionI(permission),
+        transformPermissionEntityToPermissionDTO(permission),
       );
     } catch (error) {
       throw new NotFoundException('Permission not found');
@@ -68,7 +63,7 @@ export class PermissionService {
   }
 
   // Update
-  async updatePermission(id: number, updatedPermissionData: Partial<PermissionI>): Promise<HttpResponseI<PermissionI>> {
+  async updatePermission(id: number, updatedPermissionData: PermissionDTO): Promise<HttpResponseI<PermissionDTO>> {
     const permission = await this.permissionsRepository.findOne({ where: { id: id } });
     if (!permission) {
       throw new NotFoundException('Permission not found');
@@ -78,7 +73,7 @@ export class PermissionService {
     return HttpResponse(
       HttpStatus.OK,
       'Permission updated successfully',
-      transformPermissionEntityToPermissionI(updatedPermission),
+      transformPermissionEntityToPermissionDTO(updatedPermission),
     );
   }
 

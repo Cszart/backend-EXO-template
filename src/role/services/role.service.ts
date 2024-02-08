@@ -4,10 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { RoleEntity } from '../models/role.entity';
 import { RoleI } from '../models/role.interface';
-import { transformRoleEntityToRoleI } from '../utils/role.utils';
+import { transformRoleEntityToRoleDTO } from '../utils/role.utils';
 
 import { HttpResponseI } from 'src/httpResponse/models/httpResponse.interface';
 import { HttpResponse } from 'src/httpResponse/utils/httpResponse.util';
+import { RoleDTO } from '../dtos/role.dto';
 
 @Injectable()
 export class RoleService {
@@ -19,7 +20,7 @@ export class RoleService {
   // --- CRUD functions --- //
 
   // Create
-  async createRole(roleData: RoleI): Promise<HttpResponseI<RoleI>> {
+  async createRole(roleData: RoleDTO): Promise<HttpResponseI<RoleDTO>> {
     const newRole = new RoleEntity();
 
     // Append every key received
@@ -33,28 +34,28 @@ export class RoleService {
 
     // Save to Database
     const savedRole = await this.rolesRepository.save(newRole);
-    const transformedRole = transformRoleEntityToRoleI(savedRole);
+    const transformedRole = transformRoleEntityToRoleDTO(savedRole);
 
     return HttpResponse(HttpStatus.CREATED, 'Role created successfully', transformedRole);
   }
 
   // Find all
-  async findAllRoles(): Promise<HttpResponseI<RoleI[]>> {
+  async findAllRoles(): Promise<HttpResponseI<RoleDTO[]>> {
     const rolesData = await this.rolesRepository.find({ order: { id: 'DESC' } });
 
-    const rolesResponse: RoleI[] = rolesData.map((role: RoleEntity) => transformRoleEntityToRoleI(role));
+    const rolesResponse: RoleDTO[] = rolesData.map((role: RoleEntity) => transformRoleEntityToRoleDTO(role));
 
     return HttpResponse(HttpStatus.OK, 'All roles fetched successfully', rolesResponse);
   }
 
   // Find one
-  async findOneRole(id: number): Promise<HttpResponseI<RoleI>> {
+  async findOneRole(id: number): Promise<HttpResponseI<RoleDTO>> {
     try {
       const role = await this.rolesRepository.findOne({ where: { id: id } });
       if (!role) {
         throw new NotFoundException('Role not found');
       }
-      const transformedRole = transformRoleEntityToRoleI(role);
+      const transformedRole = transformRoleEntityToRoleDTO(role);
       return HttpResponse(HttpStatus.OK, 'Role fetched successfully', transformedRole);
     } catch (error) {
       throw new NotFoundException('Role not found');
@@ -62,14 +63,14 @@ export class RoleService {
   }
 
   // Update
-  async updateRole(id: number, updatedRoleData: Partial<RoleI>): Promise<HttpResponseI<RoleI>> {
+  async updateRole(id: number, updatedRoleData: RoleDTO): Promise<HttpResponseI<RoleDTO>> {
     const role = await this.rolesRepository.findOne({ where: { id: id } });
     if (!role) {
       throw new NotFoundException('Role not found');
     }
     Object.assign(role, updatedRoleData);
     const updatedRole = await this.rolesRepository.save(role);
-    const transformedRole = transformRoleEntityToRoleI(updatedRole);
+    const transformedRole = transformRoleEntityToRoleDTO(updatedRole);
     return HttpResponse(HttpStatus.OK, 'Role updated successfully', transformedRole);
   }
 
