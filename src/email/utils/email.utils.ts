@@ -17,6 +17,7 @@ export function transformEmailTemplateEntityToEmailTemplateDTO(
   emailTemplateEntity: EmailTemplateEntity,
 ): EmailTemplateDTO {
   return {
+    id: emailTemplateEntity.id,
     uuid: emailTemplateEntity.uuid,
     name: emailTemplateEntity.name,
     content: emailTemplateEntity.content,

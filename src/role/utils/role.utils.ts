@@ -14,6 +14,7 @@ export function transformRoleEntityToRoleI(roleEntity: RoleEntity): RoleI {
 
 export function transformRoleEntityToRoleDTO(roleEntity: RoleEntity): RoleDTO {
   const roleDTO = new RoleDTO();
+  roleDTO.id = roleEntity.id;
   roleDTO.uuid = roleEntity.uuid;
   roleDTO.role = roleEntity.role;
   roleDTO.createdAt = roleEntity.createdAt.toISOString();

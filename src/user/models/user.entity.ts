@@ -5,8 +5,8 @@ export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255 })
-  accessToken: string;
+  @Column({ length: 255, nullable: true })
+  accessToken: string | null;
 
   @Column({ length: 255, unique: true })
   email: string;

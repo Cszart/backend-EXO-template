@@ -17,6 +17,7 @@ export function transformPermissionEntityToPermissionI(permissionEntity: Permiss
 
 export function transformPermissionEntityToPermissionDTO(permissionEntity: PermissionEntity): PermissionDTO {
   const permissionDTO = new PermissionDTO();
+  permissionDTO.id = permissionEntity.id;
   permissionDTO.uuid = permissionEntity.uuid;
   permissionDTO.category = permissionEntity.category;
   permissionDTO.subCategory = permissionEntity.subCategory;
