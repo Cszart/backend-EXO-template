@@ -4,17 +4,14 @@ export class EmailTemplateDTO {
   id: number;
 
   @ApiProperty()
-  uuid: string;
+  uuid?: string;
 
   @ApiProperty()
-  name: string;
+  name?: string;
 
   @ApiProperty()
   content: string;
 
-  @ApiProperty()
   createdAt?: string;
-
-  @ApiProperty()
   modifiedAt?: string;
 }

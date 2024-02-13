@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { EmailTemplateEntity } from '../models/email.entity';
 import { transformEmailTemplateEntityToEmailTemplateDTO } from '../utils/email.utils';
 import { EmailTemplateDTO } from '../dtos/email.dto';
+import { v5 as uuidv5 } from 'uuid';
 
 @Injectable()
 export class EmailTemplateService {
@@ -20,10 +21,19 @@ export class EmailTemplateService {
   async createEmailTemplate(emailTemplateData: EmailTemplateDTO): Promise<HttpResponseI<EmailTemplateDTO>> {
     const newEmailTemplate = new EmailTemplateEntity();
 
+    // Generate UUID based on the name of the template
+    const uuidNamespace = '1b671a64-40d5-491e-99b0-da01ff1f3341'; // Arbitrary namespace UUID
+    const templateName = emailTemplateData.name;
+    const uuid = uuidv5(templateName, uuidNamespace);
+
     Object.keys(emailTemplateData).forEach(key => {
       newEmailTemplate[key] = emailTemplateData[key];
     });
 
+    // Assign UUID and other data to the new email template
+    newEmailTemplate.uuid = uuid;
+
+    // Save the new email template
     const savedEmailTemplate = await this.emailTemplateRepository.save(newEmailTemplate);
 
     return HttpResponse(
